@@ -6,13 +6,13 @@ from rest_framework import serializers
 
 
 class Base64ImageField(serializers.Field):
-    ''''Кастомное поле для преобразования формата Base64'''
+    """Кастомное поле для преобразования формата Base64"""
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
             format, imgstr = data.split(';base64,')
             ext = format.split('/')[-1]
 
-            file_name = f"{uuid.uuid4().hex}.{ext}"
+            file_name = f'{uuid.uuid4().hex}.{ext}'
 
             decoded_image = base64.b64decode(imgstr)
             return ContentFile(decoded_image, name=file_name)

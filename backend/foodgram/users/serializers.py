@@ -9,7 +9,7 @@ from .validators import email_validation, name_validation, username_validation
 
 
 class UserSerializer(serializers.ModelSerializer):
-    '''Сериалайзер для Юзеров'''
+    """Сериалайзер для Юзеров"""
     email = serializers.EmailField(max_length=254)
     username = serializers.RegexField(
         regex=r'^[\w.@+-]+\Z',
@@ -44,7 +44,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    '''Сериалайзер для создлания Юзера'''
+    """Сериалайзер для создлания Юзера"""
     email = serializers.EmailField(
         max_length=254,
         validators=[email_validation]
@@ -65,11 +65,11 @@ class SignUpSerializer(serializers.ModelSerializer):
         write_only=True,
         validators=[
             MinLengthValidator(
-                8, "Пароль должен содержать не менее 8 символов."),
+                8, 'Пароль должен содержать не менее 8 символов.'),
             RegexValidator(
                 regex=r'^(?=.*[A-Za-z])(?=.*\d).+$',
-                message="Пароль должен содержать как минимум "
-                "одну букву и одну цифру.")]
+                message='Пароль должен содержать как минимум '
+                'одну букву и одну цифру.')]
                 )
 
     class Meta:
@@ -85,7 +85,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 class UserSelfSerializer(serializers.ModelSerializer):
-    '''Сериалайзер для своей страницы'''
+    """Сериалайзер для своей страницы"""
     first_name = serializers.CharField(
         max_length=150,
     )
@@ -119,7 +119,7 @@ class UserSelfSerializer(serializers.ModelSerializer):
 
 
 class PasswordSerializer(serializers.Serializer):
-    '''Сериалайзер для смены пароля'''
+    """Сериалайзер для смены пароля"""
     current_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
 
@@ -129,8 +129,8 @@ class PasswordSerializer(serializers.Serializer):
 
 
 class RecipeForFlollowSerializer(serializers.ModelSerializer):
-    '''Сериалайзер для отображения рецепта при запросах
-       связаных с подпиской(+ корзина)'''
+    """Сериалайзер для отображения рецепта при запросах
+       связаных с подпиской(+ корзина)"""
     name = serializers.ReadOnlyField()
     image = Base64ImageField(read_only=True)
     cooking_time = serializers.ReadOnlyField()
@@ -142,7 +142,7 @@ class RecipeForFlollowSerializer(serializers.ModelSerializer):
 
 
 class FollowReadSerializer(serializers.ModelSerializer):
-    '''Сериалайзер для GET-запросов к модели Подписка'''
+    """Сериалайзер для GET-запросов к модели Подписка"""
     is_subscribed = IsSubscribedField(source='*')
     recipes = RecipeForFlollowSerializer(many=True, read_only=True)
     recipes_count = RecipeCount(source='*')
@@ -156,7 +156,7 @@ class FollowReadSerializer(serializers.ModelSerializer):
 
 
 class FollowWriteSerializer(serializers.ModelSerializer):
-    '''Сериалайзер для POST-запросов к модели Подписка'''
+    """Сериалайзер для POST-запросов к модели Подписка"""
     email = serializers.ReadOnlyField()
     username = serializers.ReadOnlyField()
     is_subscribed = IsSubscribedField(source='*', required=False)

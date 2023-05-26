@@ -5,7 +5,7 @@ CHARACTER_SLICE = 20
 
 
 class Tag(models.Model):
-    '''Модель Тэг'''
+    """Модель Тэг"""
     name = models.CharField(
         max_length=200,
         unique=True,
@@ -31,7 +31,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    '''Модель Ингридиент'''
+    """Модель Ингридиент"""
     name = models.CharField(
         max_length=200,
         verbose_name='Название ингредиента'
@@ -100,7 +100,7 @@ class Recipe(models.Model):
 
 
 class AmountIngredient(models.Model):
-    '''Модель для связи Ингредиента и его количества в рецепте'''
+    """Модель для связи Ингредиента и его количества в рецепте"""
     ingredient = models.ForeignKey(
         Ingredient, on_delete=models.CASCADE,
         verbose_name='Ингредиент')

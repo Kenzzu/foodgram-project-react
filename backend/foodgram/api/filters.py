@@ -3,7 +3,7 @@ from recipes.models import Ingredient, Recipe, Tag
 
 
 class IngredientFilter(FilterSet):
-    '''Фильтер для поиска ингредиента регистронезависимо'''
+    """Фильтер для поиска ингредиента регистронезависимо"""
     name = filters.CharFilter(lookup_expr='istartswith')
 
     class Meta:
@@ -12,7 +12,7 @@ class IngredientFilter(FilterSet):
 
 
 class TagFilter(FilterSet):
-    '''Фильтр для Тэгов'''
+    """Фильтр для Тэгов"""
     tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug', to_field_name='slug',
         queryset=Tag.objects.all())

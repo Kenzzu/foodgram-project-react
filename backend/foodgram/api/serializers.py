@@ -29,7 +29,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class AmountIngredienterializer(serializers.ModelSerializer):
-    '''Сериалайзер для связки ингредиента и количества'''
+    """Сериалайзер для связки ингредиента и количества"""
     id = serializers.ReadOnlyField(
         source='ingredient.id')
     name = serializers.ReadOnlyField(
@@ -43,11 +43,11 @@ class AmountIngredienterializer(serializers.ModelSerializer):
 
 
 class IngredientAddSerializer(serializers.ModelSerializer):
-    '''Ингредиент и количество для рецепта'''
+    """Ингредиент и количество для рецепта"""
     id = serializers.IntegerField()
     amount = serializers.IntegerField(
         min_value=1, validators=[
-            MinValueValidator(1, "Количество должно быть больше 0.")]
+            MinValueValidator(1, 'Количество должно быть больше 0.')]
     )
 
     class Meta:
@@ -87,7 +87,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
                 user=self.context.get('request').user, recipe=obj).exists())
 
     def get_is_in_shopping_cart(self, obj):
-        '''Проверка рецепта на наличие в списке покупок'''
+        """Проверка рецепта на наличие в списке покупок"""
         request = self.context.get('request')
         return ShoppingCart.objects.filter(
             user=request.user, recipe=obj).exists()
@@ -108,7 +108,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
     )
     cooking_time = serializers.IntegerField(
         min_value=1, validators=[MinValueValidator(
-            1, "Количество должно быть больше 0.")])
+            1, 'Количество должно быть больше 0.')])
 
     class Meta:
         model = Recipe

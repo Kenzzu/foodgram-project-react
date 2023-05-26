@@ -50,7 +50,7 @@ class UserViewSet(viewsets.ModelViewSet):
             if not user.check_password(old_password):
                 return Response({'status': 'Старый пароль не верен'},
                                 status=status.HTTP_400_BAD_REQUEST)
-            user.set_password(serializer.data.get("new_password"))
+            user.set_password(serializer.data.get('new_password'))
             user.save()
             return Response({'status': 'Пароль успешно изменен'},
                             status=status.HTTP_204_NO_CONTENT)
@@ -96,10 +96,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
         if request.method == 'POST':
             if Follow.objects.filter(user=user, author=author).exists():
-                return Response({"error": "Вы уже подписаны на этого автора"},
+                return Response({'error': 'Вы уже подписаны на этого автора'},
                                 status=status.HTTP_400_BAD_REQUEST)
             if author == user:
-                return Response({"error": "Нельзя подписаться на себя"},
+                return Response({'error': 'Нельзя подписаться на себя'},
                                 status=status.HTTP_400_BAD_REQUEST)
             serializer = FollowWriteSerializer(
                 author, data=request.data, context={'request': request})

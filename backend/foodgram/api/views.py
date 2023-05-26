@@ -22,7 +22,7 @@ from .serializers import (AmountIngredient, IngredientSerializer,
 
 
 class TagViewSet(viewsets.ModelViewSet):
-    '''Вьюсет для Тэга'''
+    """Вьюсет для Тэга"""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     lookup_field = 'slug'
@@ -35,7 +35,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
 
 class IngridientViewSet(viewsets.ModelViewSet):
-    '''Вьюсет для Ингредиента'''
+    """Вьюсет для Ингредиента"""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend,)
@@ -49,7 +49,7 @@ class IngridientViewSet(viewsets.ModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    '''Вьюсет для Рецепта'''
+    """Вьюсет для Рецепта"""
     queryset = Recipe.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
@@ -66,7 +66,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filterset_class = TagFilter
 
     def get_serializer_class(self):
-        if self.action in ["list", "retrieve"]:
+        if self.action in ['list', 'retrieve']:
             return RecipeReadSerializer
         return RecipeWriteSerializer
 
@@ -106,11 +106,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post', 'delete'])
     def shopping_cart(self, request, **kwargs):
-        '''Добавление в список покупок'''
+        """Добавление в список покупок"""
         recipe = get_object_or_404(Recipe, id=kwargs['pk'])
         if request.method == 'POST':
             serializer = RecipeForFlollowSerializer(
-                recipe, data=request.data, context={"request": request})
+                recipe, data=request.data, context={'request': request})
             serializer.is_valid(raise_exception=True)
             if not ShoppingCart.objects.filter(user=request.user,
                                                recipe=recipe).exists():
@@ -132,7 +132,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=False)
     def download_shopping_cart(self, request):
-        '''Создания списка покупок'''
+        """Создания списка покупок"""
         user = request.user
         ingredients = (
             AmountIngredient.objects
@@ -161,7 +161,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         y = 760
         canva.setLineWidth(3)
         canva.line(x - 50, y - 10, x + 680, y - 10)
-        canva.setFont("DejaVuSans", 30)
+        canva.setFont('DejaVuSans', 30)
         canva.setFillColorRGB(0, 0.5, 1)
         canva.drawString(x, y, f'Список продуктов для {str(user)}')
 
@@ -171,13 +171,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         i = 1
         line_height = 20
         max_font_size = 14
-        canva.setFont("DejaVuSans", max_font_size)
+        canva.setFont('DejaVuSans', max_font_size)
         canva.setFillColor(colors.black)
         for ingredient in ingredients:
             text = '{}. {} - {} {}'.format(i, *ingredient)
             while canva.stringWidth(text) > 400:
                 max_font_size -= 1
-                canva.setFont("DejaVuSans", max_font_size)
+                canva.setFont('DejaVuSans', max_font_size)
             canva.drawString(x, y, text)
             y -= line_height
             i += 1
