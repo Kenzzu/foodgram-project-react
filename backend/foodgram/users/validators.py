@@ -1,3 +1,4 @@
+from django.core.validators import MinLengthValidator, RegexValidator
 from rest_framework.exceptions import ValidationError
 
 from .models import User
@@ -26,3 +27,16 @@ def name_validation(value):
     """Проверка имени и фамилии пользователя."""
     if any(char.isdigit() for char in value):
         raise ValidationError('Имя или фамилия не должно содержать цифры!')
+
+
+def password_validation(value):
+    validators = [
+        MinLengthValidator(
+            8, 'Пароль должен содержать не менее 8 символов.'),
+        RegexValidator(
+            regex=r'^(?=.*[A-Za-z])(?=.*\d).+$',
+            message='Пароль должен содержать как '
+                    'минимум одну букву и одну цифру.')
+    ]
+    for validator in validators:
+        validator(value)

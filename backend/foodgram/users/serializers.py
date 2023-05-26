@@ -1,15 +1,20 @@
-from api.custom_fields import Base64ImageField
-from django.core.validators import MinLengthValidator, RegexValidator
-from recipes.models import Recipe
 from rest_framework import serializers
+
+from api.custom_fields import Base64ImageField
+
+from recipes.models import Recipe
 
 from .custom_fields import IsSubscribedField, RecipeCount
 from .models import User
-from .validators import email_validation, name_validation, username_validation
+from .validators import (
+    email_validation,
+    name_validation,
+    username_validation,
+    password_validation)
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Сериалайзер для Юзеров"""
+    '''Сериалайзер для Юзеров'''
     email = serializers.EmailField(max_length=254)
     username = serializers.RegexField(
         regex=r'^[\w.@+-]+\Z',
@@ -44,7 +49,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    """Сериалайзер для создлания Юзера"""
+    '''Сериалайзер для создлания Юзера'''
     email = serializers.EmailField(
         max_length=254,
         validators=[email_validation]
@@ -63,14 +68,8 @@ class SignUpSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=150,
         write_only=True,
-        validators=[
-            MinLengthValidator(
-                8, 'Пароль должен содержать не менее 8 символов.'),
-            RegexValidator(
-                regex=r'^(?=.*[A-Za-z])(?=.*\d).+$',
-                message='Пароль должен содержать как минимум '
-                'одну букву и одну цифру.')]
-                )
+        required=True,
+        validators=[password_validation])
 
     class Meta:
         model = User
@@ -83,9 +82,15 @@ class SignUpSerializer(serializers.ModelSerializer):
             'password',
         )
 
+    def validate(self, attrs):
+        if User.objects.filter(
+                username=attrs['username'], email=attrs['email']).exists():
+            raise serializers.ValidationError('Такой юзер уже есть')
+        return attrs
+
 
 class UserSelfSerializer(serializers.ModelSerializer):
-    """Сериалайзер для своей страницы"""
+    '''Сериалайзер для своей страницы'''
     first_name = serializers.CharField(
         max_length=150,
     )
@@ -110,18 +115,11 @@ class UserSelfSerializer(serializers.ModelSerializer):
         )
 
 
-# class TokenSerializer(serializers.ModelSerializer):
-#     password = serializers.CharField(write_only=True)
-#     email = serializers.EmailField()
-#     class Meta:
-#         model = User
-#         fields = ('password', 'email')
-
-
 class PasswordSerializer(serializers.Serializer):
-    """Сериалайзер для смены пароля"""
+    '''Сериалайзер для смены пароля'''
     current_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(
+        required=True, validators=[password_validation])
 
     class Meta:
         model = User
@@ -129,8 +127,8 @@ class PasswordSerializer(serializers.Serializer):
 
 
 class RecipeForFlollowSerializer(serializers.ModelSerializer):
-    """Сериалайзер для отображения рецепта при запросах
-       связаных с подпиской(+ корзина)"""
+    '''Сериалайзер для отображения рецепта при запросах
+       связаных с подпиской'''
     name = serializers.ReadOnlyField()
     image = Base64ImageField(read_only=True)
     cooking_time = serializers.ReadOnlyField()
@@ -142,7 +140,7 @@ class RecipeForFlollowSerializer(serializers.ModelSerializer):
 
 
 class FollowReadSerializer(serializers.ModelSerializer):
-    """Сериалайзер для GET-запросов к модели Подписка"""
+    '''Сериалайзер для GET-запросов к модели Подписка'''
     is_subscribed = IsSubscribedField(source='*')
     recipes = RecipeForFlollowSerializer(many=True, read_only=True)
     recipes_count = RecipeCount(source='*')
@@ -156,7 +154,7 @@ class FollowReadSerializer(serializers.ModelSerializer):
 
 
 class FollowWriteSerializer(serializers.ModelSerializer):
-    """Сериалайзер для POST-запросов к модели Подписка"""
+    '''Сериалайзер для POST-запросов к модели Подписка'''
     email = serializers.ReadOnlyField()
     username = serializers.ReadOnlyField()
     is_subscribed = IsSubscribedField(source='*', required=False)
@@ -171,3 +169,9 @@ class FollowWriteSerializer(serializers.ModelSerializer):
                   'username', 'first_name',
                   'last_name', 'is_subscribed',
                   'recipes', 'recipes_count')
+
+    def validate(self, attrs):
+        if self.instance.following.filter(
+                user=self.context.get('request').user).exists():
+            raise serializers.ValidationError('Вы уже подписаны!')
+        return attrs

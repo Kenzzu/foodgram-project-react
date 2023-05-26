@@ -1,4 +1,5 @@
 from django.db import models
+
 from foodgram.settings import AUTH_USER_MODEL
 
 CHARACTER_SLICE = 20
@@ -45,6 +46,7 @@ class Ingredient(models.Model):
         unique_together = ['name', 'measurement_unit']
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Ингридиенты'
+        ordering = ('name',)
 
     def __str__(self) -> str:
         return f'Ингредиент {self.name[:CHARACTER_SLICE]}'
@@ -90,13 +92,13 @@ class Recipe(models.Model):
         auto_now_add=True,
     )
 
-    def __str__(self):
-        return f'Рецепт {self.name}'
-
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         ordering = ['-pub_date', ]
+
+    def __str__(self):
+        return f'Рецепт {self.name}'
 
 
 class AmountIngredient(models.Model):
@@ -106,7 +108,8 @@ class AmountIngredient(models.Model):
         verbose_name='Ингредиент')
     recipe = models.ForeignKey(
         Recipe, on_delete=models.CASCADE,
-        verbose_name='Рецепт')
+        verbose_name='Рецепт',
+        related_name='amount_recipe')
     amount = models.PositiveSmallIntegerField(
         verbose_name='Количество', default=1)
 
@@ -137,6 +140,7 @@ class Favorite(models.Model):
 
     class Meta:
         unique_together = ('user', 'recipe')
+        ordering = ('user',)
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
 

@@ -1,11 +1,17 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import transaction
-from recipes.models import (AmountIngredient, Favorite, Ingredient, Recipe,
-                            ShoppingCart, Tag)
+
 from rest_framework import serializers
+
+from recipes.models import (
+    AmountIngredient, Ingredient, Recipe, Tag
+)
 from users.serializers import UserSerializer
 
 from .custom_fields import Base64ImageField
+
+MIN_VALUE = 1
+MAX_VALUE = 32000
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -46,8 +52,11 @@ class IngredientAddSerializer(serializers.ModelSerializer):
     """Ингредиент и количество для рецепта"""
     id = serializers.IntegerField()
     amount = serializers.IntegerField(
-        min_value=1, validators=[
-            MinValueValidator(1, 'Количество должно быть больше 0.')]
+        min_value=MIN_VALUE, validators=[
+            MinValueValidator(
+                MIN_VALUE, 'Количество должно быть больше 0.'),
+            MaxValueValidator(
+                MAX_VALUE, 'Количество должно быть больше 32 000.')]
     )
 
     class Meta:
@@ -78,19 +87,18 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         )
 
     def get_ingredients(self, obj):
-        ingredients = AmountIngredient.objects.filter(recipe=obj)
+        ingredients = obj.amount_recipe.all()
         serializer = AmountIngredienterializer(ingredients, many=True)
         return serializer.data
 
     def get_is_favorited(self, obj):
-        return (Favorite.objects.filter(
-                user=self.context.get('request').user, recipe=obj).exists())
+        return obj.favorite.filter(
+            user=self.context.get('request').user).exists()
 
     def get_is_in_shopping_cart(self, obj):
         """Проверка рецепта на наличие в списке покупок"""
-        request = self.context.get('request')
-        return ShoppingCart.objects.filter(
-            user=request.user, recipe=obj).exists()
+        return obj.recipe_in_cart.filter(
+            user=self.context.get('request').user).exists()
 
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
@@ -107,8 +115,11 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         read_only=True
     )
     cooking_time = serializers.IntegerField(
-        min_value=1, validators=[MinValueValidator(
-            1, 'Количество должно быть больше 0.')])
+        min_value=MIN_VALUE, validators=[
+            MinValueValidator(
+                MIN_VALUE, 'Количество должно быть больше 0.'),
+            MaxValueValidator(
+                MAX_VALUE, 'Количество должно быть больше 32 000.')])
 
     class Meta:
         model = Recipe
@@ -154,3 +165,22 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         return RecipeReadSerializer(instance,
                                     context=self.context).data
+
+
+class RecipeForCartSerializer(serializers.ModelSerializer):
+    '''Сериалайзер для отображения рецепта при запросах
+       связаных с корзиной'''
+    name = serializers.ReadOnlyField()
+    image = Base64ImageField(read_only=True)
+    cooking_time = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name',
+                  'image', 'cooking_time')
+
+    def validate(self, attrs):
+        if self.instance.recipe_in_cart.filter(
+                user=self.context.get('request').user).exists():
+            raise serializers.ValidationError('Этот рецепт уже добавлен!')
+        return attrs

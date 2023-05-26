@@ -1,5 +1,6 @@
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
+
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -46,28 +47,26 @@ class UserViewSet(viewsets.ModelViewSet):
         user = get_object_or_404(User, username=request.user.username)
         serializer = PasswordSerializer(data=request.data)
         old_password = request.data.get('current_password')
-        if serializer.is_valid():
-            if not user.check_password(old_password):
-                return Response({'status': 'Старый пароль не верен'},
-                                status=status.HTTP_400_BAD_REQUEST)
-            user.set_password(serializer.data.get('new_password'))
-            user.save()
-            return Response({'status': 'Пароль успешно изменен'},
-                            status=status.HTTP_204_NO_CONTENT)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        new_password = request.data.get('new_password')
+        serializer.is_valid(raise_exception=True)
+        if new_password == old_password:
+            return Response(
+                {'status': 'Старый и новый пароль должны отличаться'},
+                status=status.HTTP_400_BAD_REQUEST)
+        if not user.check_password(old_password):
+            return Response({'status': 'Старый пароль не верен'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(serializer.data.get(new_password))
+        user.save()
+        return Response({'status': 'Пароль успешно изменен'},
+                        status=status.HTTP_204_NO_CONTENT)
 
     def create(self, request):
         serializer = SignUpSerializer(data=request.data)
-        email = request.data.get('email')
-        username = request.data.get('username')
-        user = User.objects.filter(username=username, email=email).exists()
-        if not user:
-            request.data['password'] = make_password(
-                request.data.get('password'))
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.is_valid(raise_exception=True).errors)
+        make_password(request.data.get('password'))
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         detail=False,
@@ -95,9 +94,6 @@ class UserViewSet(viewsets.ModelViewSet):
         user = self.request.user
 
         if request.method == 'POST':
-            if Follow.objects.filter(user=user, author=author).exists():
-                return Response({'error': 'Вы уже подписаны на этого автора'},
-                                status=status.HTTP_400_BAD_REQUEST)
             if author == user:
                 return Response({'error': 'Нельзя подписаться на себя'},
                                 status=status.HTTP_400_BAD_REQUEST)

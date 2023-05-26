@@ -1,6 +1,18 @@
 from django.contrib import admin
 
-from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from .models import (
+    AmountIngredient,
+    Favorite,
+    Ingredient,
+    Recipe,
+    ShoppingCart,
+    Tag)
+
+
+class AmountIngredientInline(admin.TabularInline):
+    model = AmountIngredient
+    min_num = 1
+    extra = 0
 
 
 @admin.register(Ingredient)
@@ -18,10 +30,11 @@ class TagAdmin(admin.ModelAdmin):
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('name', 'author', 'favorite_count',)
     list_filter = ('author', 'name', 'tags',)
+    inlines = (AmountIngredientInline,)
 
     @admin.display(description='В избранном')
     def favorite_count(self, obj):
-        return Favorite.objects.filter(recipe=obj).count()
+        return obj.favorite.count()
 
 
 @admin.register(Favorite)
