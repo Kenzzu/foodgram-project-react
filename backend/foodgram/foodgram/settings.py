@@ -17,7 +17,6 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
 
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
