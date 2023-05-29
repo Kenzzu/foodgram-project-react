@@ -28,6 +28,37 @@ from .serializers import (
     RecipeForCartSerializer,
 )
 
+HEADER_FONT_SIZE = 30
+BODY_INITIAL_FONT_SIZE = 14
+FOOTER_FONT_SIZE = 10
+LINE_WIDTH = 3
+LINE_HEIGHT = 20
+HEADER_X = 40
+HEADER_Y = 760
+BODY_X = 20
+BODY_Y = 720
+FOOTER_X = 40
+FOOTER_Y_FIRST = 50
+FOOTER_Y_SECOND = 30
+FILL_COLOR_RED = 0
+FILL_COLOR_GREEN = 0.5
+FILL_COLOR_BLUE = 1
+MAX_TEXT_WIDTH = 400
+BODY_INITIAL_INDEX = 1
+BODY_INCREMENT_INDEX = 1
+FONT_SIZE_DECREMENT = 1
+LINE_Y_HEADER = 750
+LINE_Y_FOOTER = 65
+LINE_X_HEADER_START = -10
+LINE_X_HEADER_END = 720
+LINE_X_FOOTER_START = -10
+LINE_X_FOOTER_END = 720
+BACKGROUND_FILL_COLOR = colors.HexColor('#D1E6FA')
+BACKGROUND_X = 0
+BACKGROUND_Y = 0
+BACKGROUND_WIDTH = letter[0]
+BACKGROUND_HEIGHT = letter[1]
+
 
 class TagViewSet(viewsets.ModelViewSet):
     """Вьюсет для Тэга"""
@@ -155,38 +186,51 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return response
 
     def draw_header(self, canva, user):
-        canva.setFillColorRGB(0, 0.5, 1)
-        canva.setFont('DejaVuSans', 30)
-        canva.drawString(40, 760, f'Список продуктов для {str(user)}')
+        canva.setFillColorRGB(
+            FILL_COLOR_RED, FILL_COLOR_GREEN, FILL_COLOR_BLUE)
+        canva.setFont('DejaVuSans', HEADER_FONT_SIZE)
+        canva.drawString(
+            HEADER_X, HEADER_Y, f'Список продуктов для {str(user)}')
 
     def draw_body(self, canva, ingredients):
-        x = 20
-        y = 720
-        i = 1
-        line_height = 20
-        max_font_size = 14
+        x = BODY_X
+        y = BODY_Y
+        i = BODY_INITIAL_INDEX
+        font_size = BODY_INITIAL_FONT_SIZE
 
-        canva.setFont('DejaVuSans', max_font_size)
+        canva.setFont('DejaVuSans', font_size)
         canva.setFillColor(colors.black)
         for ingredient in ingredients:
             text = '{}. {} - {} {}'.format(i, *ingredient)
-            while canva.stringWidth(text) > 400:
-                max_font_size -= 1
-                canva.setFont('DejaVuSans', max_font_size)
+            while canva.stringWidth(text) > MAX_TEXT_WIDTH:
+                font_size -= FONT_SIZE_DECREMENT
+                canva.setFont('DejaVuSans', font_size)
             canva.drawString(x, y, text)
-            y -= line_height
-            i += 1
+            y -= LINE_HEIGHT
+            i += BODY_INCREMENT_INDEX
 
     def draw_footer(self, canva):
-        canva.setFont('DejaVuSans', 10)
-        canva.drawString(40, 50, 'Проект: Foodgram')
-        canva.drawString(40, 30, 'Версия: v1.0')
+        canva.setFont('DejaVuSans', FOOTER_FONT_SIZE)
+        canva.drawString(FOOTER_X, FOOTER_Y_FIRST, 'Проект: Foodgram')
+        canva.drawString(FOOTER_X, FOOTER_Y_SECOND, 'Версия: v1.0')
 
     def draw_line(self, canva):
-        canva.setLineWidth(3)
-        canva.line(-10, 750, 720, 750)
-        canva.line(-10, 65, 720, 65)
+        canva.setLineWidth(LINE_WIDTH)
+        canva.line(
+            LINE_X_HEADER_START,
+            LINE_Y_HEADER,
+            LINE_X_HEADER_END,
+            LINE_Y_HEADER)
+        canva.line(
+            LINE_X_FOOTER_START,
+            LINE_Y_FOOTER,
+            LINE_X_FOOTER_END,
+            LINE_Y_FOOTER)
 
     def draw_background(self, canva):
-        canva.setFillColor(colors.HexColor('#D1E6FA'))
-        canva.rect(0, 0, letter[0], letter[1], fill=True, stroke=False)
+        canva.setFillColor(BACKGROUND_FILL_COLOR)
+        canva.rect(
+            BACKGROUND_X,
+            BACKGROUND_Y,
+            BACKGROUND_WIDTH,
+            BACKGROUND_HEIGHT, fill=True, stroke=False)

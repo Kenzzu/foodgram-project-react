@@ -63,7 +63,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         serializer = SignUpSerializer(data=request.data)
-        make_password(request.data.get('password'))
+        request.data['password'] = make_password(
+                request.data.get('password'))
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
