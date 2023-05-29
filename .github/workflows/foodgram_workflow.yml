@@ -1,5 +1,4 @@
 name: foodgram_project
-
 on:
   push:
     branches:
