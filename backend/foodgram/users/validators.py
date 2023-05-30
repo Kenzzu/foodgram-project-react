@@ -25,8 +25,8 @@ def email_validation(value):
 
 def name_validation(value):
     """Проверка имени и фамилии пользователя."""
-    if any(char.isdigit() for char in value):
-        raise ValidationError('Имя или фамилия не должно содержать цифры!')
+    if not value.isalpha():
+        raise ValidationError('Имя или фамилия должны содержать только буквы!')
 
 
 def password_validation(value):
