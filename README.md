@@ -1,6 +1,6 @@
 # Foodgram
 [![foodgram_project](https://github.com/Kenzzu/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)](https://github.com/Kenzzu/foodgram-project-react/actions/workflows/foodgram_workflow.yml)
-[![Foodgram](./frontend/public/logo192.png)](http://foodgram-kenzzu.sytes.net/)
+[![Foodgram](./frontend/public/favicon.ico)](http://foodgram-kenzzu.sytes.net/)
 
 Foodgram - это веб-приложение, которое позволяет пользователям находить, публиковать и собирать рецепты. Оно предоставляет платформу для любителей кулинарии, где они могут поделиться своими любимыми рецептами и создавать персонализированный список покупок на основе добавленных рецептов. Проект является открытым и доступен на [GitHub](https://github.com/Kenzzu/foodgram-project-react.git).
 
