@@ -52,8 +52,3 @@ python manage.py runserver
 Проект разработан [Олегом Киселевым](https://github.com/Kenzzu/).
 ## Фронтенд
 Фронтенд проекта предоставлен [Яндекс.Практикумом](https://praktikum.yandex.ru/)
-
-
-Сайт доступен по адресу: http://foodgram-kenzzu.sytes.net/
-Админ: Kenzzu
-Пароль: e85735237

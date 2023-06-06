@@ -2,6 +2,7 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
@@ -94,8 +95,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     search_fields = ('name',)
     permission_classes_by_action = {
         'create': [Admin | AuthUser],
+        'list': [AllowAny],
         'retrieve': [Admin | AuthUser | Guest],
-        'destroy': [Admin | AuthUser],
+        'destroy': [Admin | AuthUser | Guest],
         'favorite': [Admin | AuthUser],
         'shopping_cart': [Admin | AuthUser],
         'download_shopping_cart': [Admin | AuthUser],

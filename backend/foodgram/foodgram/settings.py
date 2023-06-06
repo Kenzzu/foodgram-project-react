@@ -7,9 +7,9 @@ load_dotenv()
 
 AUTH_USER_MODEL = 'users.User'
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = os.getenv('SECRET_KEY', default='1234')
+SECRET_KEY = os.getenv('SECRET_KEY', default='DSdbsqw@D@sdn1!3232')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
